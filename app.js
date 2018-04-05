@@ -2,8 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const builder = require("botbuilder");
-const handoff_1 = require("./handoff");
-const commands_1 = require("./commands");
+const handoffLib = require("./handoff");
+const commandsLib = require("./commands");
+const debug = require('debug')('bot:app');
+const mainDialog = require('./dialogs/mainDialog');
+const dotenv = require('dotenv');
+
+debug('Init');
+dotenv.load();
+
 //=========================================================
 // Bot Setup
 //=========================================================
@@ -18,18 +25,24 @@ const connector = new builder.ChatConnector({
     appPassword: process.env.MicrosoftAppPassword,
     openIdMetadata: process.env.BotOpenIdMetadata
 });
+
+const mainDialogName = 'Main Dialog';
 const bot = new builder.UniversalBot(connector, [
-    function (session, args, next) {
-        session.send('Echo ' + session.message.text);
-    }
+  function (session) {
+    session.send("Здравствуйте! Приветствуем вас в чате МТС помощника!");
+    session.beginDialog(mainDialogName);
+  }
 ]);
+
+
 app.post('/api/messages', connector.listen());
 // Create endpoint for agent / call center
 app.use('/webchat', express.static('public'));
 // replace this function with custom login/verification for agents
 const isAgent = (session) => session.message.user.name.startsWith("Agent");
-const handoff = new handoff_1.Handoff(bot, isAgent);
+const handoff = new handoffLib.Handoff(bot, isAgent);
+mainDialog({name:mainDialogName,bot,isAgent});
 //========================================================
 // Bot Middleware
 //========================================================
-bot.use(commands_1.commandsMiddleware(handoff), handoff.routingMiddleware());
+bot.use(commandsLib.commandsMiddleware(handoff), handoff.routingMiddleware());

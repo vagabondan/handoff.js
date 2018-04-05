@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const handoff_1 = require("./handoff");
+
 exports.init = () => {
     exports.conversations = [];
 };

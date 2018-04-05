@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const builder = require("botbuilder");
 const provider_1 = require("./provider");
+
 // Options for state of a conversation
 // Customer talking to bot, waiting for next available agent or talking to an agent
 var ConversationState;
@@ -12,6 +13,7 @@ var ConversationState;
     ConversationState[ConversationState["Watch"] = 3] = "Watch";
 })(ConversationState = exports.ConversationState || (exports.ConversationState = {}));
 ;
+
 class Handoff {
     // if customizing, pass in your own check for isAgent and your own versions of methods in defaultProvider
     constructor(bot, isAgent, provider = provider_1.defaultProvider) {
@@ -26,6 +28,7 @@ class Handoff {
         this.currentConversations = () => this.provider.currentConversations();
         this.provider.init();
     }
+
     routingMiddleware() {
         return {
             botbuilder: (session, next) => {
@@ -46,6 +49,7 @@ class Handoff {
             }
         };
     }
+
     routeMessage(session, next) {
         if (this.isAgent(session)) {
             this.routeAgentMessage(session);
@@ -54,6 +58,7 @@ class Handoff {
             this.routeCustomerMessage(session, next);
         }
     }
+
     routeAgentMessage(session) {
         const message = session.message;
         const conversation = this.getConversation({ agentConversationId: message.address.conversation.id });
@@ -66,6 +71,8 @@ class Handoff {
         // send text that agent typed to the customer they are in conversation with
         this.bot.send(new builder.Message().address(conversation.customer).text(message.text));
     }
+
+
     routeCustomerMessage(session, next) {
         const message = session.message;
         // method will either return existing conversation or a newly created conversation if this is first time we've heard from customer
@@ -75,7 +82,7 @@ class Handoff {
             case ConversationState.Bot:
                 return next();
             case ConversationState.Waiting:
-                session.send("Connecting you to the next available agent.");
+                session.send("Подключаю оператора...");
                 return;
             case ConversationState.Watch:
                 this.bot.send(new builder.Message().address(conversation.agent).text(message.text));

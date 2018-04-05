@@ -9,12 +9,14 @@
   },
   "scripts": {
     "nodewatch": "nodemon app.js",
-    "start": "node app.js",
+    "start": "DEBUG=bot* node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "botbuilder": "^3.7.0",
+    "botbuilder-cognitiveservices": "^1.1.0",
     "debug": "^3.1.0",
+    "dotenv": "^5.0.1",
     "express": "^4.14.0"
   },
   "devDependencies": {

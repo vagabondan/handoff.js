@@ -1,6 +1,7 @@
 "use strict";
 const builder = require('botbuilder');
 const qnaDialog = require('./qnaDialog');
+const sentimentDialog = require('./sentimentDialog');
 const debug = require('debug')('bot:mainDialog');
 
 const mainDialog = ({name,bot, isAgent}) => {
@@ -29,8 +30,8 @@ const mainDialog = ({name,bot, isAgent}) => {
     }
   ]);
 
-
   const qnaDialogName = 'QNADialog';
+  qnaDialog({name:qnaDialogName,bot});
   bot.dialog('Проблема', [
     function (session) {
       builder.Prompts.text(session, "Опишите суть обращения");
@@ -43,7 +44,20 @@ const mainDialog = ({name,bot, isAgent}) => {
     }
   ]);
 
-  qnaDialog({name:qnaDialogName,bot});
+  const sentimentDialogName = 'sentimentDialog';
+  sentimentDialog({name:sentimentDialogName,bot});
+  bot.dialog('Отзыв', [
+    function (session) {
+      builder.Prompts.text(session, "Напишите, пожалуйста, ваше впечатление о нас");
+    },
+    function(session, result){
+      session.beginDialog(sentimentDialogName,result)
+    },
+    function (session, results) {
+      session.endDialogWithResult(results);
+    }
+  ]);
+
 
 };
 

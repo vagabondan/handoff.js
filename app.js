@@ -29,10 +29,23 @@ const connector = new builder.ChatConnector({
 const mainDialogName = 'Main Dialog';
 const bot = new builder.UniversalBot(connector, [
   function (session) {
-    session.send("Здравствуйте! Приветствуем вас в чате МТС помощника!");
+    session.send("Приветствуем вас в чате МТС помощника!");
     session.beginDialog(mainDialogName);
   }
 ]);
+
+// The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
+bot.dialog('reset', function (session, args, next) {
+  session.endDialog();
+})
+  .triggerAction({
+    matches: /^reset$/i,
+    onSelectAction: (session, args, next) => {
+      // Add the help dialog to the dialog stack
+      // (override the default behavior of replacing the stack)
+      session.beginDialog(args.action, args);
+    }
+  });
 
 
 app.post('/api/messages', connector.listen());

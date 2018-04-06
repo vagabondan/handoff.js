@@ -33,11 +33,14 @@ const mainDialog = ({name,bot, isAgent}) => {
   const qnaDialogName = 'QNADialog';
   qnaDialog({name:qnaDialogName,bot});
   bot.dialog('Проблема', [
-    function (session) {
+    function (session,results) {
+      debug('Problems1:session',session);
+      debug('Problems1:results',results);
       builder.Prompts.text(session, "Опишите суть обращения");
     },
-    function(session, result){
-      session.beginDialog(qnaDialogName,result)
+    function(session, results){
+      debug('Problems2',results);
+      session.beginDialog(qnaDialogName,results)
     },
     function (session, results) {
       session.endDialogWithResult(results);
@@ -48,7 +51,7 @@ const mainDialog = ({name,bot, isAgent}) => {
   sentimentDialog({name:sentimentDialogName,bot});
   bot.dialog('Отзыв', [
     function (session) {
-      builder.Prompts.text(session, "Напишите, пожалуйста, ваше впечатление о нас");
+      builder.Prompts.text(session, "Опишите, пожалуйста, ваши впечатления о качестве поддержки");
     },
     function(session, result){
       session.beginDialog(sentimentDialogName,result)

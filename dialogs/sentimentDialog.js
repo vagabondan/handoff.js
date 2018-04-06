@@ -2,6 +2,7 @@
 const builder_cognitiveservices = require('botbuilder-cognitiveservices');
 const debug = require('debug')('bot:sentimentDialog');
 let https = require ('https');
+const azure = require('azure-storage');
 
 
 module.exports = ({name,bot}) => {
@@ -39,6 +40,7 @@ module.exports = ({name,bot}) => {
     }
   ]);
 
+
   const get_response_handler = (session) => {
     return function (response) {
       let body = '';
@@ -49,6 +51,7 @@ module.exports = ({name,bot}) => {
         let body_ = JSON.parse (body);
         let jsonBody = JSON.stringify (body_, null, '  ');
         console.log (jsonBody);
+        const full_score = body_.documents[0].score;
         const score = Number((body_.documents[0].score).toFixed(2));
         debug('score: ',score);
         if(score < 0.4){
@@ -58,6 +61,33 @@ module.exports = ({name,bot}) => {
         }else{
           session.send('Оценка: ' + score + '. Спасибо за высокую оценку нашей работы! Мы стремимся постоянно повышать качество сервиса для наших клиентов. Ждем Вас снова!').endDialog()
         }
+        const tableSvc = azure.createTableService(process.env.StorageTableId,
+          process.env.StorageTableKey);
+        const tableName = 'CustomerFeedback';
+        tableSvc.createTableIfNotExists(tableName, function(error, result, response){
+          debug("Response", response);
+          if(!error){
+            debug("Error",error);
+          }
+
+          const estimation = {
+            PartitionKey: {'_':session.message.address.channelId},
+            RowKey: {'_': session.message.address.id+'.'+session.message.address.conversation.id},
+            ClientId: session.message.address.user.id,
+            ClientName: session.message.address.user.name,
+            Score: full_score,
+            Locale: session.message.textLocale,
+            Text: session.message.text
+          };
+
+          tableSvc.insertEntity(tableName,estimation, {echoContent: true}, function (error, result, response) {
+            debug("Response", response);
+            if(!error){
+              debug("Error",error);
+            }
+          });
+        });
+
       });
       response.on ('error', function (e) {
         console.log ('Error: ' + e.message);

@@ -29,7 +29,7 @@ const connector = new builder.ChatConnector({
 const mainDialogName = 'Main Dialog';
 const bot = new builder.UniversalBot(connector, [
   function (session) {
-    session.send("Приветствуем вас в чате МТС помощника!");
+    //session.send("Приветствуем вас в чате МТС помощника!");
     session.beginDialog(mainDialogName);
   }
 ]);

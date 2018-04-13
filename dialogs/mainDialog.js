@@ -16,7 +16,7 @@ const mainDialog = ({name,bot, isAgent}) => {
 // Choose problem or feedback
   bot.dialog('ProblemOrFeedback', [
     function (session) {
-      builder.Prompts.choice(session, "Желаете ли вы...", ["оставить отзыв","обратиться в поддержку"], { listStyle: builder.ListStyle.button });
+      builder.Prompts.choice(session, "Можем предложить Вам", ["Оставить отзыв","Задать вопрос"], { listStyle: builder.ListStyle.button });
     },
     function (session, results) {
       //session.dialogData.reason = builder.EntityRecognizer.resolveTime([results.response]);

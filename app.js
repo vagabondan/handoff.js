@@ -52,7 +52,10 @@ app.post('/api/messages', connector.listen());
 // Create endpoint for agent / call center
 app.use('/webchat', express.static('public'));
 // replace this function with custom login/verification for agents
-const isAgent = (session) => session.message.user.name.startsWith("Agent");
+const isAgent = (session) => {
+  debug('User',session.message.user);
+  return session.message.user.name === undefined ? false : session.message.user.name.startsWith("Agent");
+  }
 const handoff = new handoffLib.Handoff(bot, isAgent);
 mainDialog({name:mainDialogName,bot,isAgent});
 //========================================================

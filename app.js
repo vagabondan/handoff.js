@@ -42,9 +42,9 @@ const isAgent = (session) => {
   debug('User',session.message.user);
   return session.message.user.name === undefined ? false : session.message.user.name.startsWith("Agent");
   }
-//const handoff = new handoffLib.Handoff(bot, isAgent);
+const handoff = new handoffLib.Handoff(bot, isAgent);
 mainDialog({name:mainDialogName,bot,isAgent});
 //========================================================
 // Bot Middleware
 //========================================================
-//bot.use(commandsLib.commandsMiddleware(handoff), handoff.routingMiddleware());
+bot.use(commandsLib.commandsMiddleware(handoff), handoff.routingMiddleware());

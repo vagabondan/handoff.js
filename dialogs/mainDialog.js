@@ -11,12 +11,17 @@ const mainDialog = ({name,bot, isAgent}) => {
         session.endDialog():
         session.beginDialog('ProblemOrFeedback');
     }
-  ]);
+  ])
+  // Once triggered, will start the 'showDinnerCart' dialog.
+  // Then, the waterfall will resumed from the step that was interrupted.
+    .beginDialogAction('showHelpAction', 'commandHelper', {
+      matches: /^\/?\?$/i
+    });
 
 // Choose problem or feedback
   bot.dialog('ProblemOrFeedback', [
     function (session) {
-      builder.Prompts.choice(session, "Можем предложить Вам", ["Оставить отзыв","Задать вопрос"], { listStyle: builder.ListStyle.button });
+      builder.Prompts.choice(session, "Вы всегда можете набрать '?' для вызова помощи.\n\nМожем предложить Вам:", ["Оставить отзыв","Задать вопрос"], { listStyle: builder.ListStyle.button });
     },
     function (session, results) {
       //session.dialogData.reason = builder.EntityRecognizer.resolveTime([results.response]);
@@ -46,14 +51,10 @@ const mainDialog = ({name,bot, isAgent}) => {
       session.replaceDialog('Проблема');
     }
   ])
-  // Once triggered, will start the 'showDinnerCart' dialog.
-  // Then, the waterfall will resumed from the step that was interrupted.
-    .beginDialogAction('showHelpAction', 'commandHelper', {
-      matches: /^\/?\?$/i
-    });
+
 
   bot.dialog('commandHelper', function (session) {
-      session.endDialog('reset/stop/end/bye - reset the conversation, go to main menu\n\n? - this help');
+      session.endDialog('reset/stop/end/bye/пока и др. - сброс диалогов, возврат в гланое меню\n\n? - вызов данной подсказки');
     }
   );
 

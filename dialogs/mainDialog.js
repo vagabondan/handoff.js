@@ -54,7 +54,7 @@ const mainDialog = ({name,bot, isAgent}) => {
 
 
   bot.dialog('commandHelper', function (session) {
-      session.endDialog('reset/stop/end/bye/пока и др. - сброс диалогов, возврат в гланое меню\n\n? - вызов данной подсказки');
+      session.endDialog('reset/stop/end/bye/пока и др. - сброс диалогов, возврат в главное меню\n\n? - вызов данной подсказки');
     }
   );
 

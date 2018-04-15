@@ -29,14 +29,15 @@ module.exports = ({name,bot}) => {
     function(session,result){
 
       debug('result: ',result);
-      if(result === undefined) session.endDialog();
+      if(result === undefined) session.endDialog()
+      else{
+        let documents = { 'documents': [
+            { 'id': '1', 'language': 'ru', 'text': result.response}
+          ]};
 
-      let documents = { 'documents': [
-          { 'id': '1', 'language': 'ru', 'text': result.response}
-        ]};
-
-      get_sentiments (documents,session);
-      //session.send('Спасибо, что оценили нас!');
+        get_sentiments (documents,session);
+        //session.send('Спасибо, что оценили нас!');
+      }
     }
   ]);
 
@@ -55,11 +56,11 @@ module.exports = ({name,bot}) => {
         const score = Number((body_.documents[0].score).toFixed(2));
         debug('score: ',score);
         if(score < 0.4){
-          session.send('Оценка: ' + score + '. Сожалеем :( И приложим все усилия, чтобы изменить ваше мнение о нас к лучшему!').endDialog()
+          session.endDialog('Оценка: ' + score + '. Сожалеем :( И приложим все усилия, чтобы изменить ваше мнение о нас к лучшему!')
         }else if(score < 0.7){
-          session.send('Оценка: ' + score + '. Благодарим за обращение! Мы стремимся постоянно повышать качество сервиса для наших клиентов. Ждем Вас снова!').endDialog()
+          session.endDialog('Оценка: ' + score + '. Благодарим за отзыв! Мы стремимся постоянно повышать качество сервиса для наших клиентов.')
         }else{
-          session.send('Оценка: ' + score + '. Спасибо за высокую оценку нашей работы! Мы стремимся постоянно повышать качество сервиса для наших клиентов. Ждем Вас снова!').endDialog()
+          session.endDialog('Оценка: ' + score + '. Спасибо за высокую оценку нашей работы! Мы стремимся постоянно повышать качество сервиса для наших клиентов.')
         }
         const tableSvc = azure.createTableService(process.env.StorageTableId,
           process.env.StorageTableKey);

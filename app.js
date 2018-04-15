@@ -26,27 +26,13 @@ const connector = new builder.ChatConnector({
     openIdMetadata: process.env.BotOpenIdMetadata
 });
 
+const inMemoryStorage = new builder.MemoryBotStorage();
 const mainDialogName = 'Main Dialog';
 const bot = new builder.UniversalBot(connector, [
   function (session) {
-    //session.send("Приветствуем вас в чате МТС помощника!");
     session.beginDialog(mainDialogName);
   }
-]);
-
-// The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
-bot.dialog('reset', function (session, args, next) {
-  session.endDialog();
-})
-  .triggerAction({
-    matches: /^reset$/i,
-    onSelectAction: (session, args, next) => {
-      // Add the help dialog to the dialog stack
-      // (override the default behavior of replacing the stack)
-      session.beginDialog(args.action, args);
-    }
-  });
-
+]).set('storage',inMemoryStorage);
 
 app.post('/api/messages', connector.listen());
 // Create endpoint for agent / call center
@@ -56,9 +42,9 @@ const isAgent = (session) => {
   debug('User',session.message.user);
   return session.message.user.name === undefined ? false : session.message.user.name.startsWith("Agent");
   }
-const handoff = new handoffLib.Handoff(bot, isAgent);
+//const handoff = new handoffLib.Handoff(bot, isAgent);
 mainDialog({name:mainDialogName,bot,isAgent});
 //========================================================
 // Bot Middleware
 //========================================================
-bot.use(commandsLib.commandsMiddleware(handoff), handoff.routingMiddleware());
+//bot.use(commandsLib.commandsMiddleware(handoff), handoff.routingMiddleware());

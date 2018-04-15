@@ -10,7 +10,7 @@
   "scripts": {
     "nodewatch": "nodemon app.js",
     "start": "node app.js",
-    "dev": "DEBUG=bot* node app.js",
+    "dev": "DEBUG=bot* nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

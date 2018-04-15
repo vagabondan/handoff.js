@@ -33,35 +33,50 @@ const mainDialog = ({name,bot, isAgent}) => {
   const qnaDialogName = 'QNADialog';
   qnaDialog({name:qnaDialogName,bot});
   bot.dialog('Проблема', [
-    function (session,results) {
-      debug('Problems1:session',session);
-      debug('Problems1:results',results);
-      builder.Prompts.text(session, "Опишите суть обращения");
+    function (session) {
+      debug('Проблема:задайте вопрос',session.message);
+      builder.Prompts.text(session,'Задайте вопрос...');
     },
     function(session, results){
-      debug('Problems2',results);
+      debug('Проблема:инициация QnA',results);
       session.beginDialog(qnaDialogName,results)
     },
-    function (session, results) {
-      session.endDialogWithResult(results);
+    function(session, results){
+      debug('Проблема:установка петли',results)
+      session.replaceDialog('Проблема');
     }
-  ]);
+  ])
+  // Once triggered, will start the 'showDinnerCart' dialog.
+  // Then, the waterfall will resumed from the step that was interrupted.
+    .beginDialogAction('showHelpAction', 'commandHelper', {
+      matches: /^\/?\?$/i
+    });
+
+  bot.dialog('commandHelper', function (session) {
+      session.endDialog('reset/stop/end/bye - reset the conversation, go to main menu\n\n? - this help');
+    }
+  );
 
   const sentimentDialogName = 'sentimentDialog';
   sentimentDialog({name:sentimentDialogName,bot});
   bot.dialog('Отзыв', [
     function (session) {
-      builder.Prompts.text(session, "Опишите, пожалуйста, ваши впечатления о качестве поддержки");
+      builder.Prompts.text(session, "Каково Ваше мнение о нас?");
     },
     function(session, result){
       session.beginDialog(sentimentDialogName,result)
     },
     function (session, results) {
-      session.endDialogWithResult(results);
+      session.replaceDialog('Отзыв');
     }
   ]);
 
-
+  // The dialog stack is cleared and this dialog is invoked when the user enters 'help'.
+  bot.dialog('resetDialog', function (session, args, next) {
+    session.replaceDialog(name);
+  }).triggerAction({
+      matches: /^\/?(reset|спасибо|хватит|назад|меню|пока|в начало|end|stop|thanks|thanx|bye)$/i
+    });
 };
 
 module.exports = mainDialog;

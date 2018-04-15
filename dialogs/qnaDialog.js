@@ -1,9 +1,10 @@
 "use strict";
 const builder_cognitiveservices = require('botbuilder-cognitiveservices');
 const debug = require('debug')('bot:qnaDialog');
-
+const builder = require('botbuilder');
 
 module.exports = ({name,bot}) => {
+
 
   const recognizer = new builder_cognitiveservices.QnAMakerRecognizer({
     knowledgeBaseId: process.env.QnAKnowledgebaseId,
@@ -15,17 +16,17 @@ module.exports = ({name,bot}) => {
     defaultMessage: 'К сожалению, информация по вашему запросу не найдена. Попробуйте перефразировать.',
     qnaThreshold: 0.3}
   );
-
+/*
   basicQnAMakerDialog.respondFromQnAMakerResult = function(session, qnaMakerResult){
-    debug('response: ',qnaMakerResult);
-    debug('session.message object:',session.message);
+    debug('QnA:response: ',qnaMakerResult);
+    debug('QnA:session.message object:',session.message);
     // Save the question
     const question = session.message.text;
     session.conversationData.userQuestion = question;
 
-    session.send(qnaMakerResult.answers[0].answer).endDialog();
+    //session.send(qnaMakerResult.answers[0].answer).endDialog();
   }
-
+*/
   bot.dialog(name, basicQnAMakerDialog);
 
 };

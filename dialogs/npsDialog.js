@@ -23,14 +23,14 @@ module.exports = ({name,bot}) => {
         }
       }
     },
-    function(session,results){
+    function(session,results,next){
       if(session.dialogData.nps && results.response){
         const nps = session.dialogData.nps;
         session.dialogData.responses=[];
         session.dialogData.responses.push(results.response.entity);
         const isQuestionResolved = results.response.index === 0;//'Вопрос решен'
         if(nps>8){
-          session.endDialog('Спасибо за участие в опросе!');
+          next();
         }else{ //nps <= 8
           if(isQuestionResolved){
             if(nps>6){
@@ -48,13 +48,13 @@ module.exports = ({name,bot}) => {
                 ],{ listStyle: builder.ListStyle.list });
             }
           }else{
-            session.endDialog('Спасибо за участие в опросе!');
+            next();
           }
         }
       }
     },
     function(session,results){
-      if(results.response)
+      if(results && results.response)
         session.dialogData.responses.push(results.response.entity);
       const tableSvc = azure.createTableService(process.env.StorageTableId, process.env.StorageTableKey);
       const tableName = 'NPSDialog';

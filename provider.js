@@ -40,7 +40,7 @@ const connectCustomerToBot = (by) => {
         return false;
     conversation.state = handoff_1.ConversationState.Bot;
     if (conversation.agent)
-        delete conversation.agent;
+      delete conversation.agent;
     return true;
 };
 // Get

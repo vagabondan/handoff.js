@@ -21,7 +21,11 @@ class Handoff {
         this.isAgent = isAgent;
         this.provider = provider;
         this.connectCustomerToAgent = (by, nextState, agentAddress) => this.provider.connectCustomerToAgent(by, nextState, agentAddress);
-        this.connectCustomerToBot = (by) => this.provider.connectCustomerToBot(by);
+        this.connectCustomerToBot = (by) => {
+          const conversation = this.provider.getConversation(by);
+          this.provider.connectCustomerToBot(by);
+          this.bot.beginDialog(conversation.customer,'npsDialog');
+        };
         this.queueCustomerForAgent = (by) => this.provider.queueCustomerForAgent(by);
         this.addToTranscript = (by, text) => this.provider.addToTranscript(by, text);
         this.getConversation = (by, customerAddress) => this.provider.getConversation(by, customerAddress);
@@ -42,7 +46,7 @@ class Handoff {
                 const message = event;
                 const customerConversation = this.getConversation({ customerConversationId: event.address.conversation.id });
                 // send message to agent observing conversation
-                if (customerConversation.state === ConversationState.Watch) {
+                if (customerConversation && customerConversation.state === ConversationState.Watch) {
                     this.bot.send(new builder.Message().address(customerConversation.agent).text(message.text));
                 }
                 this.trancribeMessageFromBot(message, next);
@@ -110,6 +114,19 @@ class Handoff {
         else {
             session.send('No Transcript to show. Try entering a username or try again when connected to a customer');
         }
+    }
+
+    connectToOperator(session,next){
+      const message = session.message;
+      // lookup the conversation (create it if one doesn't already exist)
+      const conversation = this.getConversation({ customerConversationId: message.address.conversation.id }, message.address);
+      if (conversation.state == ConversationState.Bot) {
+        this.addToTranscript({ customerConversationId: conversation.customer.conversation.id }, message.text);
+        this.queueCustomerForAgent({ customerConversationId: conversation.customer.conversation.id });
+        session.send("Ищу доступных операторов...");
+        return;
+      }
+      return next();
     }
 }
 exports.Handoff = Handoff;

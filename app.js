@@ -2,14 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const builder = require("botbuilder");
-const handoffLib = require("./handoff");
-const commandsLib = require("./commands");
-const debug = require('debug')('bot:app');
-const mainDialog = require('./dialogs/mainDialog');
 const dotenv = require('dotenv');
+const debug = require('debug')('bot:app');
 
 debug('Init');
 dotenv.load();
+
+const handoffLib = require("./handoff");
+const commandsLib = require("./commands");
+
+const mainDialog = require('./dialogs/mainDialog');
+
+
+
 
 //=========================================================
 // Bot Setup
@@ -43,7 +48,7 @@ const isAgent = (session) => {
   return session.message.user.name === undefined ? false : session.message.user.name.startsWith("Agent");
   }
 const handoff = new handoffLib.Handoff(bot, isAgent);
-mainDialog({name:mainDialogName,bot,isAgent});
+mainDialog({name:mainDialogName,bot,isAgent,handoff});
 //========================================================
 // Bot Middleware
 //========================================================

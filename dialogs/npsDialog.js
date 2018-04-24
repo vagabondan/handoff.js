@@ -30,7 +30,7 @@ module.exports = ({name,bot}) => {
         session.dialogData.responses.push(results.response.entity);
         const isQuestionResolved = results.response.index === 0;//'Вопрос решен'
         if(nps>8){
-          session.endDialog();
+          session.endDialog('Спасибо за участие в опросе!');
         }else{ //nps <= 8
           if(isQuestionResolved){
             if(nps>6){
@@ -47,6 +47,8 @@ module.exports = ({name,bot}) => {
                   'Все устраивает, низкая оценка была выставлена ошибочно'
                 ],{ listStyle: builder.ListStyle.list });
             }
+          }else{
+            session.endDialog('Спасибо за участие в опросе!');
           }
         }
       }
